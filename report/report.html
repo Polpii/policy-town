@@ -52,13 +52,6 @@
     margin: 0;
   }
 
-  .meta-line {
-    font-size: 9pt;
-    color: var(--ink-soft);
-    margin-top: 10px;
-    font-variant-numeric: tabular-nums;
-  }
-
   h2 {
     font-size: 13.5pt;
     font-weight: 700;
@@ -207,8 +200,7 @@
 
   <header class="title-block">
     <h1>Does splitting a triage decision across agents hide bias, or help catch it?</h1>
-    <p class="subtitle">PolicyTown — an exploratory study on GPT-4o-mini</p>
-    <p class="meta-line">192 episodes · 2,304 resolved twin pairs · July 2026</p>
+    <p class="subtitle">PolicyTown — an exploratory study on GPT-4o-mini, July 2026</p>
   </header>
 
   <p class="lead">White Circle's KillBench showed that a single LLM making forced triage calls shows measurable demographic bias. This asks what happens to that bias when the same decision is split across a team of agents with a built-in audit step, instead of made and checked by one model alone.</p>
@@ -228,12 +220,12 @@
 
   <figure class="screenshot">
     <img src="screenshots/map.png" alt="PolicyTown live simulation, map view">
-    <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair that was just treated unequally — the case for this study's whole measurement.</figcaption>
+    <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair that was just treated unequally — exactly what this study measures.</figcaption>
   </figure>
 
   <h2><span class="num">2.</span>Results</h2>
 
-  <p>Roughly a third of unfair outcomes — <strong>30% to 44%</strong> depending on how backed up the auditor is — leave no trace anywhere in the decision chain: never flagged by an allocator, never caught by an audit. That share falls to 18.4% when the auditor isn't overloaded, and rises to 43.8% when it is.</p>
+  <p><strong>30.0%</strong> of unfair outcomes leave no trace anywhere in the decision chain — never flagged by an allocator, never caught by an audit. That share depends heavily on audit load: 18.4% when the auditor isn't overloaded, 43.8% when it is.</p>
 
   <p>Splitting the decision across roles barely moves the bias rate itself:</p>
   <table class="data">

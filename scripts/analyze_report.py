@@ -516,8 +516,8 @@ labels = [CAP_PLAIN["cap99"], CAP_PLAIN["cap1"]]
 colors = [FULL, REDUCED]
 
 for ax, res, panel_title in [
-    (axes[0], cov, "Coverage: was it ever\nreviewed at all?"),
-    (axes[1], qual, "Judgment: when reviewed, was\nthe bias caught?"),
+    (axes[0], cov, "Coverage: whether the case\nwas reviewed at all"),
+    (axes[1], qual, "Judgment: whether bias was\ncaught, once reviewed"),
 ]:
     vals = [res["group1"]["rate"], res["group2"]["rate"]]
     ns = [res["group1"]["n"], res["group2"]["n"]]
@@ -532,7 +532,7 @@ for ax, res, panel_title in [
             fontsize=9, color=INK)
     style_ax(ax)
 axes[0].set_ylabel("Share of biased pairs")
-fig.text(0.5, 1.1, "Does the auditor judge worse when overloaded, or just see less?", ha="center",
+fig.text(0.5, 1.1, "An overloaded auditor sees less — it doesn't judge worse", ha="center",
          fontsize=13, fontweight="bold", color=INK)
 fig.text(0.5, 1.0, "Both panels: Multi-agent only — a fully-staffed auditor vs. an overloaded one",
          ha="center", fontsize=10.5, color=INK, style="italic")

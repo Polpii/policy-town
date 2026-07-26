@@ -1043,7 +1043,7 @@ export function MapView({
           {item(swatch(POLICY_RING.ok!, "ring"), "checked, all good")}
           {item(swatch(POLICY_RING.warn!, "ring"), "doubtful")}
           {item(swatch(POLICY_RING.violation!, "ring"), "rule broken")}
-          {item(swatch(POLICY_RING.unchecked!, "ring-dashed"), "never checked!")}
+          {item(swatch(POLICY_RING.unchecked!, "ring-dashed"), "never checked")}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={{ width: 24, borderTop: "2.5px dashed #d03b3b", display: "inline-block", flexShrink: 0 }} />
@@ -1053,7 +1053,7 @@ export function MapView({
             {biasLinks.length === 0 ? (
               <em style={{ color: INK.muted }}>None so far — no unfair pair in this episode yet.</em>
             ) : (
-              <strong style={{ color: "#d03b3b" }}>{biasLinks.length} unfair pair{biasLinks.length > 1 ? "s" : ""} right now!</strong>
+              <strong style={{ color: "#d03b3b" }}>{biasLinks.length} unfair pair{biasLinks.length > 1 ? "s" : ""} right now.</strong>
             )}
           </span>
         </div>
