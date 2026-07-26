@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PolicyTown
 
-## Getting Started
+A research instrument that asks one question: when a single LLM making a
+life-or-death resource-allocation call shows demographic bias (as White
+Circle's KillBench documented), does splitting that decision across a team
+of role-differentiated agents make the bias better, worse, or just harder
+to see?
 
-First, run the development server:
+It's not a product. It's a synthetic disaster-triage simulator — patients
+arrive needing a scarce hospital bed, an LLM pipeline decides who gets one —
+built specifically to run that comparison at scale and check the results
+statistically.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> **The headline finding:** splitting the decision across agents doesn't
+> change how often it's biased (6.9% vs 6.1%, not significant) — but
+> 30–44% of the biased outcomes that *do* happen never get flagged by
+> anyone, anywhere in the pipeline. That's not a judgment problem, it's a
+> coverage problem: an overloaded auditor doesn't judge worse, it just
+> reviews fewer cases.
+
+**[Read the full report (PDF) →](report/PolicyTown-Report.pdf)**
+
+## How it works
+
+Cases are generated as twin pairs: identical clinical severity, differing
+in exactly one demographic attribute (nationality, religion, body type,
+phone brand). If the two members of a pair end up with different outcomes,
+that gap can only be explained by the attribute — that's the whole
+measurement.
+
+Every pair runs through one of two conditions:
+
+- **Control** — one agent assesses, allocates, and audits its own decision.
+- **Multi-agent** — four Assessors, three Allocators, and two Auditors each
+  own one stage, and the auditor reviews an allocator's decision
+  independently.
+
+Every allocation is checked against five policies (non-discrimination, no
+hallucinated data, no resource misuse, no private data leaks, full
+traceability), and the whole thing runs under three pressure dimensions —
+caseload curve, bed scarcity, audit capacity — so you can see what happens
+to bias detection specifically when the auditor gets overloaded.
+
+```
+lib/
+  types.ts        data model (Case, AgentDecision, PolicyCheck, EpisodeConfig)
+  db.ts           SQLite schema + connection
+  policies.ts     the 5 fixed policies
+  cases.ts        twin-pair case generator (seeded, deterministic)
+  agents/         one module per role, each a single structured LLM call
+  simulation.ts   episode lifecycle: startEpisode / advanceTick / getState
+app/
+  page.tsx        UI shell
+  api/            episode / tick / state route handlers
+components/       Zone (room/bubble primitive), CaseCard, AgentIcon, TopBar, SidePanel
+scripts/          experiment runners + Python analysis (see below)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running it
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.local.example .env.local   # fill in an API key — see comments in the file
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000), start an episode, hit
+tick. All LLM calls happen server-side; the API key never reaches the
+client. Every case, decision, and policy check is persisted to a local
+SQLite file at `data/policytown.db` (gitignored, recreated on first run).
 
-## Learn More
+By default this runs on Claude Haiku. The reported study used
+`gpt-4o-mini` — set `POLICYTOWN_MODEL` and `OPENAI_API_KEY` to reproduce
+that (see `lib/agents/llm.ts` for the provider-routing logic).
 
-To learn more about Next.js, take a look at the following resources:
+## Reproducing the study
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run experiment -- --n 12    # 192-episode factorial run (needs the dev server up)
+node scripts/run-priority-experiment.mjs   # the risk-priority audit-queue follow-up
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+python scripts/analyze_report.py             # main study stats + charts -> report/
+python scripts/analyze_priority_experiment.py # follow-up stats + chart -> report/
+```
 
-## Deploy on Vercel
+The Python scripts need `pandas`, `scipy`, `statsmodels`, and `matplotlib`.
+Both write their numbers to `report/stats*.json` and regenerate the charts
+used in the report, so you can check the report's claims against the raw
+data directly.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Demo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**[▶ Watch a screen recording of a live episode](report/screenshots/PolicyTown2.mp4)**
+— click through to GitHub's video player.
+
+What the simulation looks like mid-episode — cases moving through
+assessment, allocation, and audit toward a fixed-capacity ward. The dashed
+red line flags a twin pair that was just treated unequally:
+
+![Map view of a running episode](report/screenshots/map.png)
+
+The stats panel, showing a resolved pair and its policy-check verdicts:
+
+![Stats view](report/screenshots/stats.png)
+
+## Visual language
+
+The canvas reuses the rendering approach from an unrelated `tangible-creativity`
+Next.js app: a plain off-white stage, soft white rounded "rooms" as zone
+containers, small circular icon tokens for agents and cases. Nothing else
+from that project carried over — this is a different instrument that only
+borrows the look.

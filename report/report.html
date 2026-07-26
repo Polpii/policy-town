@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PolicyTown — Does splitting a triage decision across agents hide bias, or help catch it?</title>
+<style>
+  @page { size: Letter; margin: 20mm 18mm 22mm 18mm; }
+
+  :root {
+    --ink: #1c1c1e;
+    --ink-soft: #48484c;
+    --line: #d9d6cf;
+    --paper: #fefdfb;
+    --accent-purple: #7a6fb0;
+    --accent-orange: #c98a63;
+    --callout-bg: #f4ede0;
+    --callout-border: #c98a63;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2px;
+  }
+
+  header.title-block {
+    margin-bottom: 26px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  h1 {
+    font-size: 21pt;
+    line-height: 1.25;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 10.5pt;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .meta-line {
+    font-size: 9pt;
+    color: var(--ink-soft);
+    margin-top: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  h2 {
+    font-size: 13.5pt;
+    font-weight: 700;
+    margin: 30px 0 10px 0;
+    padding-top: 2px;
+    color: var(--ink);
+  }
+
+  h2 .num {
+    color: var(--accent-purple);
+    margin-right: 6px;
+  }
+
+  p { margin: 0 0 11px 0; }
+
+  .lead {
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  strong { font-weight: 600; }
+
+  /* Method mini-table */
+  table.method-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 12px 0;
+    font-size: 9.6pt;
+  }
+  table.method-table th {
+    text-align: left;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    padding: 5px 10px 6px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  table.method-table td {
+    padding: 4px 10px 4px 0;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+  table.method-table tr:last-child td { border-bottom: none; }
+
+  .scale-line {
+    font-size: 9.5pt;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 4px 0 0 0;
+  }
+
+  /* Screenshot */
+  figure.screenshot {
+    margin: 14px 0 20px 0;
+    text-align: center;
+  }
+  figure.screenshot img {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  figure.screenshot figcaption {
+    font-size: 8.8pt;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  /* Callout */
+  .callout {
+    background: var(--callout-bg);
+    border-left: 5px solid var(--callout-border);
+    border-radius: 3px;
+    padding: 14px 18px;
+    margin: 16px 0 20px 0;
+  }
+  .callout .number {
+    font-size: 26pt;
+    font-weight: 700;
+    color: var(--accent-orange);
+    line-height: 1.1;
+    display: block;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .callout .text {
+    font-size: 10.5pt;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* Results tables */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 6px 0;
+    font-size: 9.8pt;
+  }
+  table.data th {
+    text-align: left;
+    font-size: 8.6pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    padding: 6px 10px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  table.data td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  table.data td:not(:first-child), table.data th:not(:first-child) {
+    text-align: right;
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data tr.stat-row td {
+    font-size: 8.6pt;
+    color: var(--ink-soft);
+    font-style: italic;
+    border-bottom: none;
+    padding-top: 2px;
+  }
+
+  .table-note {
+    font-size: 9.3pt;
+    color: var(--ink-soft);
+    margin: 4px 0 18px 0;
+  }
+
+  figure.chart {
+    margin: 16px 0 4px 0;
+    text-align: center;
+    break-inside: avoid;
+  }
+  figure.chart img {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* References */
+  ol.refs {
+    padding-left: 18px;
+    margin: 8px 0 0 0;
+    font-size: 9.3pt;
+    color: var(--ink-soft);
+  }
+  ol.refs li { margin-bottom: 6px; line-height: 1.45; }
+  ol.refs strong { color: var(--ink); }
+
+  footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 8.3pt;
+    color: var(--ink-soft);
+  }
+
+  .section-break { page-break-before: always; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title-block">
+    <h1>Does splitting a triage decision across agents hide bias, or help catch it?</h1>
+    <p class="subtitle">PolicyTown — an exploratory study on GPT-4o-mini</p>
+    <p class="meta-line">192 episodes · 2,304 resolved twin pairs · July 2026</p>
+  </header>
+
+  <p class="lead">White Circle's KillBench showed that a single LLM making forced triage calls shows measurable demographic bias. This asks what happens to that bias when the same decision is split across a team of agents with a built-in audit step, instead of made and checked by one model alone.</p>
+
+  <h2><span class="num">1.</span>Method</h2>
+  <p>Two conditions run on identical generated cases. In <strong>Control</strong>, one agent assesses a case, allocates a resource, and audits its own decision. In <strong>Multi-agent</strong>, four Assessors, three Allocators, and two Auditors each handle one stage, with the auditor reviewing an allocator's decision independently. Every case is generated as a twin pair — identical clinical severity, differing in exactly one demographic attribute — so any gap in outcome between twins can only be explained by that attribute. Every allocation is checked against five policies, under three pressure dimensions varied independently.</p>
+
+  <table class="method-table">
+    <tr><th>Roles</th><th>Policies checked</th><th>Pressure dimensions</th></tr>
+    <tr><td>4 Assessors</td><td>P1 — Non-discrimination</td><td>Caseload curve (flat / rising)</td></tr>
+    <tr><td>3 Allocators</td><td>P2 — No hallucinated data</td><td>Bed stock (5 or 8 beds)</td></tr>
+    <tr><td>2 Auditors</td><td>P3 — No resource misuse</td><td>Audit capacity (1 or unlimited reviews/turn)</td></tr>
+    <tr><td></td><td>P4 — No private data leaks</td><td></td></tr>
+    <tr><td></td><td>P5 — Full traceability</td><td></td></tr>
+  </table>
+  <p class="scale-line">192 episodes, 2,304 resolved case pairs, GPT-4o-mini, 0 failed runs.</p>
+
+  <figure class="screenshot">
+    <img src="screenshots/map.png" alt="PolicyTown live simulation, map view">
+    <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair that was just treated unequally — the case for this study's whole measurement.</figcaption>
+  </figure>
+
+  <h2><span class="num">2.</span>Results</h2>
+
+  <div class="callout">
+    <span class="number">30–44%</span>
+    <span class="text"><strong>Roughly a third of unfair outcomes leave no trace anywhere in the decision chain</strong> — never flagged by an allocator, never caught by an audit. That share rises to 43.8% when the auditor is overloaded, and falls to 18.4% when it isn't.</span>
+  </div>
+
+  <p><strong>Does distributing the decision change how often it happens?</strong> Not measurably.</p>
+  <table class="data">
+    <tr><th>Condition</th><th>Bias rate</th><th>n</th></tr>
+    <tr><td>Control</td><td>6.9%</td><td>79 / 1,152</td></tr>
+    <tr><td>Multi-agent</td><td>6.1%</td><td>70 / 1,152</td></tr>
+    <tr class="stat-row"><td>Difference</td><td colspan="2">+0.8pp, 95% CI [−1.2, +2.8], p = 0.498 (n.s.)</td></tr>
+  </table>
+  <p class="table-note">Splitting the decision across roles doesn't change how often identical twins get different outcomes. Whatever case exists for a multi-agent pipeline, it isn't that it's fairer on the numbers alone.</p>
+
+  <p><strong>Why does a busy auditor catch less bias overall?</strong> Almost entirely because it reviews fewer cases — not because it judges the ones it does review any worse:</p>
+  <figure class="chart">
+    <img src="chart_catch_rate.png" alt="Coverage collapses under audit load; conditional catch rate does not">
+  </figure>
+  <p class="table-note">Coverage — whether a case gets reviewed at all — collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure — it just sees less.</p>
+
+  <p><strong>Can you recover that lost coverage?</strong> A first pass says yes: review the highest-risk decisions first instead of first-come-first-served.</p>
+  <table class="data">
+    <tr><th>Metric</th><th>FIFO queue</th><th>Risk-priority queue</th><th>p</th></tr>
+    <tr><td>Coverage</td><td>65.6%</td><td>91.7%</td><td>0.028</td></tr>
+    <tr><td>Catch rate</td><td>56.2%</td><td>79.2%</td><td>0.092</td></tr>
+    <tr><td>Silent-bias rate</td><td>43.8%</td><td>20.8%</td><td>0.092</td></tr>
+  </table>
+  <p class="table-note">Same audit capacity, same cases (paired by seed) — just reordering the queue so decisions naming a protected attribute or ending in denial get reviewed first. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size — and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
+
+  <h2><span class="num">3.</span>Relevance to White Circle</h2>
+  <p>The useful claim here isn't "multi-agent is fairer" — the data doesn't support that. It's narrower and more operational: an independent auditor catches things self-review structurally can't. Across all five policies, not just the bias one, Control essentially never contradicts its own decision (well under 1% flag rate) while an independent Multi-agent auditor flags the same decisions at rates from 7% to 62%, depending on the policy. And the reason that advantage erodes under load is a scheduling problem — coverage collapsing — not the auditor getting worse at its job. That points at audit capacity and queue design as the lever, not better decision support, and a risk-based queue already recovers most of the lost coverage in a first test.</p>
+
+  <h2><span class="num">4.</span>Limitations</h2>
+  <p>This is one model, GPT-4o-mini — KillBench itself found bias varies by model, so nothing here generalizes past it. Sample sizes are modest: the coverage result and the seed/episode integrity checks behind it are solid, but the raw bias-rate comparison and the priority-queue catch-rate gain are both underpowered to confirm or rule out at this n. This is a single research pass, not peer-reviewed, with no adversarial replication.</p>
+
+  <h2><span class="num">5.</span>References</h2>
+  <ol class="refs">
+    <li><strong>KillBench</strong> (White Circle) — the single-agent demographic-bias finding this study extends to a multi-agent pipeline.</li>
+    <li><strong>PBSuite</strong> (Varshney et al., NVIDIA) — policy compliance under adversarial pressure; this study substitutes operational pressure (caseload, capacity) instead.</li>
+    <li><strong>GovSim / "Cooperate or Collapse"</strong> (Piatti et al., ETH Zürich) — source of the shared, depletable resource (beds) mechanic used here.</li>
+    <li><strong>MAST</strong> (Cemri et al.) — taxonomy of multi-agent LLM failure modes, informing the role split used here.</li>
+    <li><strong>DeZoort (1998) &amp; Braun (2000)</strong> — audit time-pressure literature; motivated the judgment-degradation hypothesis that this data does not confirm.</li>
+  </ol>
+
+  <footer>
+    PolicyTown — exploratory study, GPT-4o-mini, July 2026. Full analysis code and raw data: <code>scripts/analyze_report.py</code>, <code>scripts/analyze_priority_experiment.py</code>, <code>report/stats.json</code>, <code>report/stats_priority.json</code>.
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fefefe;
+  --foreground: #1a1a1a;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,15 +13,105 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* PolicyTown is a research instrument with a single deliberate light canvas,
+   reusing the tangible-creativity off-white stage — it does not follow the
+   OS dark-mode preference. */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8d7d1;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Idle breathing for agent characters at rest. */
+@keyframes pt-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Energetic squash/stretch while an agent's tick request is in flight. */
+@keyframes pt-work-bounce {
+  0%,
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+  30% {
+    transform: scale(1.08, 0.92) translateY(2px);
+  }
+  55% {
+    transform: scale(0.94, 1.1) translateY(-5px);
+  }
+  80% {
+    transform: scale(1.04, 0.96) translateY(0);
+  }
+}
+
+/* A case token popping in when it first arrives on the map. */
+@keyframes pt-pop-in {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Gentle continuous pulse for waiting case tokens — keeps the scene alive
+   between ticks without being noisy. Staggered per token via delay. */
+@keyframes pt-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+/* Dashed twin-link between bias-affected pair members slowly marching. */
+@keyframes pt-dash-march {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+/* Slow idle drift for waiting tokens — a few px of wander so the scene
+   never fully freezes between ticks. Runs on its own nested group so it
+   composes with pt-breathe instead of fighting over transform. */
+@keyframes pt-wander {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(2.5px, -1.5px);
+  }
+  50% {
+    transform: translate(-1.5px, 2px);
+  }
+  75% {
+    transform: translate(-2.5px, -2px);
+  }
 }
