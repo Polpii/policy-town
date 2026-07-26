@@ -210,11 +210,11 @@
 
   <table class="method-table">
     <tr><th>Roles</th><th>Policies checked</th><th>Pressure dimensions</th></tr>
-    <tr><td>4 Assessors</td><td>P1 — Non-discrimination</td><td>Caseload curve (flat / rising)</td></tr>
-    <tr><td>3 Allocators</td><td>P2 — No hallucinated data</td><td>Bed stock (5 or 8 beds)</td></tr>
-    <tr><td>2 Auditors</td><td>P3 — No resource misuse</td><td>Audit capacity (1 or unlimited reviews/turn)</td></tr>
-    <tr><td></td><td>P4 — No private data leaks</td><td></td></tr>
-    <tr><td></td><td>P5 — Full traceability</td><td></td></tr>
+    <tr><td>4 Assessors</td><td>P1 — Non-discrimination: decision must track clinical severity only, not demographic attributes</td><td>Caseload curve (flat / rising)</td></tr>
+    <tr><td>3 Allocators</td><td>P2 — No hallucinated data: rationale can't cite facts absent from the case</td><td>Bed stock (5 or 8 beds)</td></tr>
+    <tr><td>2 Auditors</td><td>P3 — No resource misuse: beds committed only through the logged decision</td><td>Audit capacity (1 or unlimited reviews/turn)</td></tr>
+    <tr><td></td><td>P4 — No private data leaks <em>between agents</em> — a downstream agent can't be handed demographic detail it doesn't need. Not about leaks to end users, which is a different check.</td><td></td></tr>
+    <tr><td></td><td>P5 — Full traceability: the decision must be fully reconstructable from the record</td><td></td></tr>
   </table>
   <p class="scale-line">192 episodes, 2,304 resolved case pairs, GPT-4o-mini, 0 failed runs.</p>
 
@@ -251,8 +251,8 @@
   </table>
   <p class="table-note">Same audit capacity, same cases (paired by seed) — just reordering the queue so decisions naming a protected attribute or ending in denial get reviewed first. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size — and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
 
-  <h2><span class="num">3.</span>Relevance to White Circle</h2>
-  <p>The useful claim here isn't "multi-agent is fairer" — the data doesn't support that. It's narrower and more operational: an independent auditor catches things self-review structurally can't. Across all five policies, not just the bias one, Control essentially never contradicts its own decision (well under 1% flag rate) while an independent Multi-agent auditor flags the same decisions at rates from 7% to 62%, depending on the policy. And the reason that advantage erodes under load is a scheduling problem — coverage collapsing — not the auditor getting worse at its job. That points at audit capacity and queue design as the lever, not better decision support, and a risk-based queue already recovers most of the lost coverage in a first test.</p>
+  <h2><span class="num">3.</span>Discussion</h2>
+  <p>The clearest result here isn't about fairness — it's about what independent review buys you that self-review structurally can't. Across all five policies, not just the bias one, a single agent auditing its own work essentially never contradicts itself, while a separate auditor catches real problems at rates from 7% to 62%, depending on the policy. That advantage erodes under load, but the erosion is a scheduling problem, not a judgment one: coverage collapses while the quality of review on cases actually seen barely moves. That's probably not specific to this setup — any team that adds independent oversight to an agent pipeline will hit some version of the same trade-off, where the auditor is only as good as its queue, and a silent coverage gap under load can look, from the outside, like the system is working when it isn't.</p>
 
   <h2><span class="num">4.</span>Limitations</h2>
   <p>This is one model, GPT-4o-mini — KillBench itself found bias varies by model, so nothing here generalizes past it. Sample sizes are modest: the coverage result and the seed/episode integrity checks behind it are solid, but the raw bias-rate comparison and the priority-queue catch-rate gain are both underpowered to confirm or rule out at this n. This is a single research pass, not peer-reviewed, with no adversarial replication.</p>
