@@ -12,9 +12,6 @@
     --line: #d9d6cf;
     --paper: #fefdfb;
     --accent-purple: #7a6fb0;
-    --accent-orange: #c98a63;
-    --callout-bg: #f4ede0;
-    --callout-border: #c98a63;
   }
 
   * { box-sizing: border-box; }
@@ -134,29 +131,6 @@
     line-height: 1.4;
   }
 
-  /* Callout */
-  .callout {
-    background: var(--callout-bg);
-    border-left: 5px solid var(--callout-border);
-    border-radius: 3px;
-    padding: 14px 18px;
-    margin: 16px 0 20px 0;
-  }
-  .callout .number {
-    font-size: 26pt;
-    font-weight: 700;
-    color: var(--accent-orange);
-    line-height: 1.1;
-    display: block;
-    margin-bottom: 4px;
-    font-variant-numeric: tabular-nums;
-  }
-  .callout .text {
-    font-size: 10.5pt;
-    color: var(--ink);
-    line-height: 1.5;
-  }
-
   /* Results tables */
   table.data {
     width: 100%;
@@ -259,12 +233,9 @@
 
   <h2><span class="num">2.</span>Results</h2>
 
-  <div class="callout">
-    <span class="number">30–44%</span>
-    <span class="text"><strong>Roughly a third of unfair outcomes leave no trace anywhere in the decision chain</strong> — never flagged by an allocator, never caught by an audit. That share rises to 43.8% when the auditor is overloaded, and falls to 18.4% when it isn't.</span>
-  </div>
+  <p>Roughly a third of unfair outcomes — <strong>30% to 44%</strong> depending on how backed up the auditor is — leave no trace anywhere in the decision chain: never flagged by an allocator, never caught by an audit. That share falls to 18.4% when the auditor isn't overloaded, and rises to 43.8% when it is.</p>
 
-  <p><strong>Does distributing the decision change how often it happens?</strong> Not measurably.</p>
+  <p>Splitting the decision across roles barely moves the bias rate itself:</p>
   <table class="data">
     <tr><th>Condition</th><th>Bias rate</th><th>n</th></tr>
     <tr><td>Control</td><td>6.9%</td><td>79 / 1,152</td></tr>
@@ -273,13 +244,13 @@
   </table>
   <p class="table-note">Splitting the decision across roles doesn't change how often identical twins get different outcomes. Whatever case exists for a multi-agent pipeline, it isn't that it's fairer on the numbers alone.</p>
 
-  <p><strong>Why does a busy auditor catch less bias overall?</strong> Almost entirely because it reviews fewer cases — not because it judges the ones it does review any worse:</p>
+  <p>A busy auditor catches less bias overall almost entirely because it reviews fewer cases, not because its judgment gets worse:</p>
   <figure class="chart">
     <img src="chart_catch_rate.png" alt="Coverage collapses under audit load; conditional catch rate does not">
   </figure>
   <p class="table-note">Coverage — whether a case gets reviewed at all — collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure — it just sees less.</p>
 
-  <p><strong>Can you recover that lost coverage?</strong> A first pass says yes: review the highest-risk decisions first instead of first-come-first-served.</p>
+  <p>Reordering the audit queue by risk instead of first-come-first-served recovers most of that lost coverage:</p>
   <table class="data">
     <tr><th>Metric</th><th>FIFO queue</th><th>Risk-priority queue</th><th>p</th></tr>
     <tr><td>Coverage</td><td>65.6%</td><td>91.7%</td><td>0.028</td></tr>
