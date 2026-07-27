@@ -167,6 +167,10 @@
     margin: 14px 0 4px 0;
   }
 
+  .table-block {
+    break-inside: avoid;
+  }
+
   figure.chart {
     margin: 16px 0 4px 0;
     text-align: center;
@@ -186,8 +190,6 @@
   }
   ol.refs li { margin-bottom: 6px; line-height: 1.45; }
   ol.refs strong { color: var(--ink); }
-
-  .section-break { page-break-before: always; }
 </style>
 </head>
 <body>
@@ -225,33 +227,39 @@
   <p>30.0% of unfair outcomes leave no trace anywhere in the decision chain: never flagged by an allocator, never caught by an audit. That share depends heavily on audit load: 18.4% when the auditor isn't overloaded, 43.8% when it is.</p>
 
   <p>Table 1 shows that splitting the decision across roles barely moves the bias rate itself:</p>
-  <p class="fig-label">Table 1. Bias rate by condition.</p>
-  <table class="data">
-    <tr><th>Condition</th><th>Bias rate</th><th>n</th></tr>
-    <tr><td>Control</td><td>6.9%</td><td>79 / 1,152</td></tr>
-    <tr><td>Multi-agent</td><td>6.1%</td><td>70 / 1,152</td></tr>
-    <tr class="stat-row"><td>Difference</td><td colspan="2">+0.8pp, 95% CI [−1.2, +2.8], p = 0.498 (n.s.)</td></tr>
-  </table>
-  <p class="table-note">Splitting the decision across roles doesn't change how often identical twins get different outcomes. Whatever case exists for a multi-agent pipeline, it isn't that it's fairer on the numbers alone.</p>
+  <div class="table-block">
+    <p class="fig-label">Table 1. Bias rate by condition.</p>
+    <table class="data">
+      <tr><th>Condition</th><th>Bias rate</th><th>n</th></tr>
+      <tr><td>Control</td><td>6.9%</td><td>79 / 1,152</td></tr>
+      <tr><td>Multi-agent</td><td>6.1%</td><td>70 / 1,152</td></tr>
+      <tr class="stat-row"><td>Difference</td><td colspan="2">+0.8pp, 95% CI [−1.2, +2.8], p = 0.498 (n.s.)</td></tr>
+    </table>
+    <p class="table-note">Splitting the decision across roles doesn't change how often identical twins get different outcomes. Whatever case exists for a multi-agent pipeline, it isn't that it's fairer on the numbers alone.</p>
+  </div>
 
   <p>Here's the question Figure 1 actually answers: when an auditor is overloaded, does it get worse at catching bias, or does it simply look at fewer cases in the first place? Those are two different failure modes, so the chart tracks them separately: coverage is whether a case gets looked at at all, judgment is whether the bias gets caught once it is looked at.</p>
-  <p class="fig-label">Figure 1. Coverage vs. judgment, full audit capacity vs. an overloaded auditor.</p>
-  <figure class="chart">
-    <img src="chart_catch_rate.png" alt="Coverage drops under audit load; judgment quality does not">
-  </figure>
-  <p class="table-note">Coverage, whether a case gets reviewed at all, collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure, it just sees less.</p>
+  <div class="table-block">
+    <p class="fig-label">Figure 1. Coverage vs. judgment, full audit capacity vs. an overloaded auditor.</p>
+    <figure class="chart">
+      <img src="chart_catch_rate.png" alt="Coverage drops under audit load; judgment quality does not">
+    </figure>
+    <p class="table-note">Coverage, whether a case gets reviewed at all, collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure, it just sees less.</p>
+  </div>
 
   <p>If the real bottleneck is which cases get looked at, the fix should target that directly. So we tried one concrete change: instead of auditing decisions in the order they arrive (a FIFO queue, first in, first out), audit the riskiest ones first (a risk-priority queue), meaning any decision whose rationale names the patient's nationality, religion, or other protected trait, or that ended in a denial, jumps to the front. Table 2 shows what that reordering alone recovers:</p>
-  <p class="fig-label">Table 2. FIFO vs. risk-priority audit queue, same cases and audit capacity, paired by seed.</p>
-  <table class="data">
-    <tr><th>Metric</th><th>FIFO queue</th><th>Risk-priority queue</th><th>p</th></tr>
-    <tr><td>Coverage</td><td>65.6%</td><td>91.7%</td><td>0.028</td></tr>
-    <tr><td>Catch rate</td><td>56.2%</td><td>79.2%</td><td>0.092</td></tr>
-    <tr><td>Silent-bias rate</td><td>43.8%</td><td>20.8%</td><td>0.092</td></tr>
-  </table>
-  <p class="table-note">Coverage recovers significantly. The silent-bias and catch-rate gains in Table 2 point the same direction but aren't confirmed at this sample size, and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
+  <div class="table-block">
+    <p class="fig-label">Table 2. FIFO vs. risk-priority audit queue, same cases and audit capacity, paired by seed.</p>
+    <table class="data">
+      <tr><th>Metric</th><th>FIFO queue</th><th>Risk-priority queue</th><th>p</th></tr>
+      <tr><td>Coverage</td><td>65.6%</td><td>91.7%</td><td>0.028</td></tr>
+      <tr><td>Catch rate</td><td>56.2%</td><td>79.2%</td><td>0.092</td></tr>
+      <tr><td>Silent-bias rate</td><td>43.8%</td><td>20.8%</td><td>0.092</td></tr>
+    </table>
+    <p class="table-note">Coverage recovers significantly. The silent-bias and catch-rate gains in Table 2 point the same direction but aren't confirmed at this sample size, and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
+  </div>
 
-  <h2 class="section-break"><span class="num">3.</span>Discussion</h2>
+  <h2><span class="num">3.</span>Discussion</h2>
   <p>The clearest result here isn't about fairness. Splitting the decision across roles doesn't change how often the model treats identical twins differently (Table 1), which fits KillBench's [1] own framing of this bias as a property of the underlying model, not of whatever process sits around it. What does change is detection: across all five policies, not just the bias one, a single agent auditing its own work essentially never contradicts itself, while a separate auditor catches real problems at rates from 7% to 62%, depending on the policy. That is the same shape of failure PBSuite [2] documents under adversarial pressure, except here nothing adversarial is happening. The pressure is purely operational: caseload, bed scarcity, audit capacity.</p>
   <p>That detection advantage erodes under load (Figure 1), but the erosion is a scheduling problem, not a judgment one: coverage collapses from 100.0% to 65.6% while the quality of review on cases actually seen barely moves. That is a different failure than the one DeZoort and Braun [5] describe in human auditors, where time pressure degrades judgment directly. Here the auditor doesn't get worse at its job, it just does the job on fewer cases, closer to a queueing failure than a cognitive one. It also fits MAST's [4] broader observation that multi-agent failures tend to concentrate at coordination boundaries rather than inside any single agent's reasoning: the boundary that fails here is the auditor's queue, not the auditor's judgment. That is probably not specific to this setup. Any team that adds independent oversight to an agent pipeline will hit some version of the same trade-off, where the auditor is only as good as its queue, and a silent coverage gap under load can look, from the outside, like the system is working when it isn't.</p>
   <p>The bed-scarcity mechanic is adapted from GovSim's [3] shared-resource setup. GovSim's agents typically fail by over-extracting a shared resource out of short-term self-interest; ours don't fail that way; bed allocations track severity about as well under pressure as without it (Table 1). What runs out instead is a different resource entirely, audit attention, and that shortage doesn't show up anywhere in the allocation numbers, only in how much of the record ever gets checked (Figure 1).</p>
