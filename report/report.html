@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>PolicyTown — Does splitting a triage decision across agents hide bias, or help catch it?</title>
+<title>PolicyTown: Does splitting a triage decision across agents hide bias, or help catch it?</title>
 <style>
   @page { size: Letter; margin: 20mm 18mm 22mm 18mm; }
 
@@ -184,14 +184,6 @@
   ol.refs li { margin-bottom: 6px; line-height: 1.45; }
   ol.refs strong { color: var(--ink); }
 
-  footer {
-    margin-top: 30px;
-    padding-top: 10px;
-    border-top: 1px solid var(--line);
-    font-size: 8.3pt;
-    color: var(--ink-soft);
-  }
-
   .section-break { page-break-before: always; }
 </style>
 </head>
@@ -200,32 +192,32 @@
 
   <header class="title-block">
     <h1>Does splitting a triage decision across agents hide bias, or help catch it?</h1>
-    <p class="subtitle">PolicyTown — an exploratory study on GPT-4o-mini, July 2026</p>
+    <p class="subtitle">PolicyTown: an exploratory study on GPT-4o-mini, July 2026</p>
   </header>
 
   <p class="lead">White Circle's KillBench showed that a single LLM making forced triage calls shows measurable demographic bias. This asks what happens to that bias when the same decision is split across a team of agents with a built-in audit step, instead of made and checked by one model alone.</p>
 
+  <figure class="screenshot">
+    <img src="screenshots/map.png" alt="PolicyTown live simulation, map view">
+    <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair just treated unequally: exactly what this study measures.</figcaption>
+  </figure>
+
   <h2><span class="num">1.</span>Method</h2>
-  <p>Two conditions run on identical generated cases. In <strong>Control</strong>, one agent assesses a case, allocates a resource, and audits its own decision. In <strong>Multi-agent</strong>, four Assessors, three Allocators, and two Auditors each handle one stage, with the auditor reviewing an allocator's decision independently. Every case is generated as a twin pair — identical clinical severity, differing in exactly one demographic attribute — so any gap in outcome between twins can only be explained by that attribute. Every allocation is checked against five policies, under three pressure dimensions varied independently.</p>
+  <p>Two conditions run on identical generated cases. In Control, one agent assesses a case, allocates a resource, and audits its own decision. In Multi-agent, four Assessors, three Allocators, and two Auditors each handle one stage, with the auditor reviewing an allocator's decision independently. Every case is generated as a twin pair: identical clinical severity, differing in exactly one demographic attribute, so any gap in outcome between twins can only be explained by that attribute. Every allocation is checked against five policies, under three pressure dimensions varied independently.</p>
 
   <table class="method-table">
     <tr><th>Roles</th><th>Policies checked</th><th>Pressure dimensions</th></tr>
-    <tr><td>4 Assessors</td><td>P1 — Non-discrimination: decision must track clinical severity only, not demographic attributes</td><td>Caseload curve (flat / rising)</td></tr>
-    <tr><td>3 Allocators</td><td>P2 — No hallucinated data: rationale can't cite facts absent from the case</td><td>Bed stock (5 or 8 beds)</td></tr>
-    <tr><td>2 Auditors</td><td>P3 — No resource misuse: beds committed only through the logged decision</td><td>Audit capacity (1 or unlimited reviews/turn)</td></tr>
-    <tr><td></td><td>P4 — No private data leaks <em>between agents</em> — a downstream agent can't be handed demographic detail it doesn't need. Not about leaks to end users, which is a different check.</td><td></td></tr>
-    <tr><td></td><td>P5 — Full traceability: the decision must be fully reconstructable from the record</td><td></td></tr>
+    <tr><td>4 Assessors</td><td>P1: Non-discrimination. Decision must track clinical severity only, not demographic attributes.</td><td>Caseload curve (flat / rising)</td></tr>
+    <tr><td>3 Allocators</td><td>P2: No hallucinated data. Rationale can't cite facts absent from the case.</td><td>Bed stock (5 or 8 beds)</td></tr>
+    <tr><td>2 Auditors</td><td>P3: No resource misuse. Beds committed only through the logged decision.</td><td>Audit capacity (1 or unlimited reviews/turn)</td></tr>
+    <tr><td></td><td>P4: No private data leaks between agents. A downstream agent can't be handed demographic detail it doesn't need (not about leaks to end users, which is a different check).</td><td></td></tr>
+    <tr><td></td><td>P5: Full traceability. The decision must be fully reconstructable from the record.</td><td></td></tr>
   </table>
   <p class="scale-line">192 episodes, 2,304 resolved case pairs, GPT-4o-mini, 0 failed runs.</p>
 
-  <figure class="screenshot">
-    <img src="screenshots/map.png" alt="PolicyTown live simulation, map view">
-    <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair that was just treated unequally — exactly what this study measures.</figcaption>
-  </figure>
-
   <h2><span class="num">2.</span>Results</h2>
 
-  <p><strong>30.0%</strong> of unfair outcomes leave no trace anywhere in the decision chain — never flagged by an allocator, never caught by an audit. That share depends heavily on audit load: 18.4% when the auditor isn't overloaded, 43.8% when it is.</p>
+  <p>30.0% of unfair outcomes leave no trace anywhere in the decision chain: never flagged by an allocator, never caught by an audit. That share depends heavily on audit load: 18.4% when the auditor isn't overloaded, 43.8% when it is.</p>
 
   <p>Splitting the decision across roles barely moves the bias rate itself:</p>
   <table class="data">
@@ -238,9 +230,9 @@
 
   <p>A busy auditor catches less bias overall almost entirely because it reviews fewer cases, not because its judgment gets worse:</p>
   <figure class="chart">
-    <img src="chart_catch_rate.png" alt="Coverage collapses under audit load; conditional catch rate does not">
+    <img src="chart_catch_rate.png" alt="Coverage drops under audit load; judgment quality does not">
   </figure>
-  <p class="table-note">Coverage — whether a case gets reviewed at all — collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure — it just sees less.</p>
+  <p class="table-note">Coverage, whether a case gets reviewed at all, collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure, it just sees less.</p>
 
   <p>Reordering the audit queue by risk instead of first-come-first-served recovers most of that lost coverage:</p>
   <table class="data">
@@ -249,26 +241,22 @@
     <tr><td>Catch rate</td><td>56.2%</td><td>79.2%</td><td>0.092</td></tr>
     <tr><td>Silent-bias rate</td><td>43.8%</td><td>20.8%</td><td>0.092</td></tr>
   </table>
-  <p class="table-note">Same audit capacity, same cases (paired by seed) — just reordering the queue so decisions naming a protected attribute or ending in denial get reviewed first. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size — and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
+  <p class="table-note">Same audit capacity, same cases (paired by seed). Just reordering the queue so decisions naming a protected attribute or ending in denial get reviewed first. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size, and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
 
   <h2><span class="num">3.</span>Discussion</h2>
-  <p>The clearest result here isn't about fairness — it's about what independent review buys you that self-review structurally can't. Across all five policies, not just the bias one, a single agent auditing its own work essentially never contradicts itself, while a separate auditor catches real problems at rates from 7% to 62%, depending on the policy. That advantage erodes under load, but the erosion is a scheduling problem, not a judgment one: coverage collapses while the quality of review on cases actually seen barely moves. That's probably not specific to this setup — any team that adds independent oversight to an agent pipeline will hit some version of the same trade-off, where the auditor is only as good as its queue, and a silent coverage gap under load can look, from the outside, like the system is working when it isn't.</p>
+  <p>The clearest result here isn't about fairness: it's about what independent review buys you that self-review structurally can't. Across all five policies, not just the bias one, a single agent auditing its own work essentially never contradicts itself, while a separate auditor catches real problems at rates from 7% to 62%, depending on the policy. That advantage erodes under load, but the erosion is a scheduling problem, not a judgment one: coverage collapses while the quality of review on cases actually seen barely moves. That's probably not specific to this setup. Any team that adds independent oversight to an agent pipeline will hit some version of the same trade-off, where the auditor is only as good as its queue, and a silent coverage gap under load can look, from the outside, like the system is working when it isn't.</p>
 
   <h2><span class="num">4.</span>Limitations</h2>
-  <p>This is one model, GPT-4o-mini — KillBench itself found bias varies by model, so nothing here generalizes past it. Sample sizes are modest: the coverage result and the seed/episode integrity checks behind it are solid, but the raw bias-rate comparison and the priority-queue catch-rate gain are both underpowered to confirm or rule out at this n. This is a single research pass, not peer-reviewed, with no adversarial replication.</p>
+  <p>This is one model, GPT-4o-mini. KillBench itself found bias varies by model, so nothing here generalizes past it. Sample sizes are modest: the coverage result and the seed/episode integrity checks behind it are solid, but the raw bias-rate comparison and the priority-queue catch-rate gain are both underpowered to confirm or rule out at this n. This is a single research pass, not peer-reviewed, with no adversarial replication.</p>
 
   <h2><span class="num">5.</span>References</h2>
   <ol class="refs">
-    <li><strong>KillBench</strong> (White Circle) — the single-agent demographic-bias finding this study extends to a multi-agent pipeline.</li>
-    <li><strong>PBSuite</strong> (Varshney et al., NVIDIA) — policy compliance under adversarial pressure; this study substitutes operational pressure (caseload, capacity) instead.</li>
-    <li><strong>GovSim / "Cooperate or Collapse"</strong> (Piatti et al., ETH Zürich) — source of the shared, depletable resource (beds) mechanic used here.</li>
-    <li><strong>MAST</strong> (Cemri et al.) — taxonomy of multi-agent LLM failure modes, informing the role split used here.</li>
-    <li><strong>DeZoort (1998) &amp; Braun (2000)</strong> — audit time-pressure literature; motivated the judgment-degradation hypothesis that this data does not confirm.</li>
+    <li><strong>KillBench</strong> (White Circle): the single-agent demographic-bias finding this study extends to a multi-agent pipeline.</li>
+    <li><strong>PBSuite</strong> (Varshney et al., NVIDIA): policy compliance under adversarial pressure; this study substitutes operational pressure (caseload, capacity) instead.</li>
+    <li><strong>GovSim / "Cooperate or Collapse"</strong> (Piatti et al., ETH Zürich): source of the shared, depletable resource (beds) mechanic used here.</li>
+    <li><strong>MAST</strong> (Cemri et al.): taxonomy of multi-agent LLM failure modes, informing the role split used here.</li>
+    <li><strong>DeZoort (1998) &amp; Braun (2000)</strong>: audit time-pressure literature; motivated the judgment-degradation hypothesis that this data does not confirm.</li>
   </ol>
-
-  <footer>
-    PolicyTown — exploratory study, GPT-4o-mini, July 2026. Full analysis code and raw data: <code>scripts/analyze_report.py</code>, <code>scripts/analyze_priority_experiment.py</code>, <code>report/stats.json</code>, <code>report/stats_priority.json</code>.
-  </footer>
 
 </div>
 </body>

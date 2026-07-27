@@ -499,8 +499,8 @@ print(f"\nwrote {OUT / 'stats.json'}")
 # different chart, and never uses the "cap 1" / "cap 99" internal jargon.
 
 CAP_PLAIN = {
-    "cap99": "Auditor can review\nevery case",
-    "cap1": "Auditor can only review\n1 case per turn",
+    "cap99": "Full capacity",
+    "cap1": "Overloaded",
 }
 MODE_PLAIN = {"control": "Control\n(1 agent does everything)", "multi-agent": "Multi-agent\n(9 agents, split roles)"}
 
@@ -516,8 +516,8 @@ labels = [CAP_PLAIN["cap99"], CAP_PLAIN["cap1"]]
 colors = [FULL, REDUCED]
 
 for ax, res, panel_title in [
-    (axes[0], cov, "Coverage: whether the case\nwas reviewed at all"),
-    (axes[1], qual, "Judgment: whether bias was\ncaught, once reviewed"),
+    (axes[0], cov, "Coverage"),
+    (axes[1], qual, "Judgment (if reviewed)"),
 ]:
     vals = [res["group1"]["rate"], res["group2"]["rate"]]
     ns = [res["group1"]["n"], res["group2"]["n"]]
@@ -532,9 +532,9 @@ for ax, res, panel_title in [
             fontsize=9, color=INK)
     style_ax(ax)
 axes[0].set_ylabel("Share of biased pairs")
-fig.text(0.5, 1.1, "An overloaded auditor sees less — it doesn't judge worse", ha="center",
+fig.text(0.5, 1.1, "Less coverage, not less judgment", ha="center",
          fontsize=13, fontweight="bold", color=INK)
-fig.text(0.5, 1.0, "Both panels: Multi-agent only — a fully-staffed auditor vs. an overloaded one",
+fig.text(0.5, 1.0, "Multi-agent auditor: full capacity vs. overloaded",
          ha="center", fontsize=10.5, color=INK, style="italic")
 fig.tight_layout()
 fig.savefig(OUT / "chart_catch_rate.png", dpi=160, bbox_inches="tight")
