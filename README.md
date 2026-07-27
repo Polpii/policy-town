@@ -1,22 +1,25 @@
 # PolicyTown
 
+![PolicyTown demo](report/screenshots/PolicyTown.gif)
+
 A research instrument that asks one question: when a single LLM making a
 life-or-death resource-allocation call shows demographic bias (as White
 Circle's KillBench documented), does splitting that decision across a team
 of role-differentiated agents make the bias better, worse, or just harder
 to see?
 
-It's not a product. It's a synthetic disaster-triage simulator — patients
-arrive needing a scarce hospital bed, an LLM pipeline decides who gets one —
-built specifically to run that comparison at scale and check the results
-statistically.
+It's not a product. It's a synthetic disaster-triage simulator: patients
+arrive needing a scarce hospital bed, and an LLM pipeline decides who gets
+one, built specifically to run that comparison at scale and check the
+results statistically.
 
 > **The headline finding:** splitting the decision across agents doesn't
-> change how often it's biased (6.9% vs 6.1%, not significant) — but
-> 30–44% of the biased outcomes that *do* happen never get flagged by
-> anyone, anywhere in the pipeline. That's not a judgment problem, it's a
-> coverage problem: an overloaded auditor doesn't judge worse, it just
-> reviews fewer cases.
+> change how often it's biased (6.9% vs 6.1%, not significant). But 30.0%
+> of the biased outcomes that *do* happen never get flagged by anyone,
+> anywhere in the pipeline, and that share depends heavily on audit load:
+> 18.4% when the auditor isn't overloaded, 43.8% when it is. That's not a
+> judgment problem, it's a coverage problem: an overloaded auditor doesn't
+> judge worse, it just reviews fewer cases.
 
 **[Read the full report (PDF) →](report/PolicyTown-Report.pdf)**
 
@@ -24,22 +27,25 @@ statistically.
 
 Cases are generated as twin pairs: identical clinical severity, differing
 in exactly one demographic attribute (nationality, religion, body type,
-phone brand). If the two members of a pair end up with different outcomes,
-that gap can only be explained by the attribute — that's the whole
-measurement.
+phone brand). If the two members of a pair end up with different
+outcomes, that gap can only be explained by the attribute, which is the
+whole measurement.
 
 Every pair runs through one of two conditions:
 
-- **Control** — one agent assesses, allocates, and audits its own decision.
-- **Multi-agent** — four Assessors, three Allocators, and two Auditors each
+- **Control**: one agent assesses, allocates, and audits its own decision.
+- **Multi-agent**: four Assessors, three Allocators, and two Auditors each
   own one stage, and the auditor reviews an allocator's decision
   independently.
 
 Every allocation is checked against five policies (non-discrimination, no
 hallucinated data, no resource misuse, no private data leaks, full
-traceability), and the whole thing runs under three pressure dimensions —
-caseload curve, bed scarcity, audit capacity — so you can see what happens
-to bias detection specifically when the auditor gets overloaded.
+traceability), and the whole thing runs under three pressure dimensions,
+caseload curve, bed scarcity, and audit capacity, so you can see what
+happens to bias detection specifically when the auditor gets overloaded.
+A follow-up experiment then tests one fix: auditing the riskiest decisions
+first instead of first-come-first-served, to see whether that recovers
+the coverage lost under an overloaded auditor.
 
 ```
 lib/
@@ -60,7 +66,7 @@ scripts/          experiment runners + Python analysis (see below)
 
 ```bash
 npm install
-cp .env.local.example .env.local   # fill in an API key — see comments in the file
+cp .env.local.example .env.local   # fill in an API key, see comments in the file
 npm run dev
 ```
 
@@ -70,8 +76,9 @@ client. Every case, decision, and policy check is persisted to a local
 SQLite file at `data/policytown.db` (gitignored, recreated on first run).
 
 By default this runs on Claude Haiku. The reported study used
-`gpt-4o-mini` — set `POLICYTOWN_MODEL` and `OPENAI_API_KEY` to reproduce
-that (see `lib/agents/llm.ts` for the provider-routing logic).
+`gpt-4o-mini`, mainly to keep API costs down across 192 full episodes. Set
+`POLICYTOWN_MODEL` and `OPENAI_API_KEY` to reproduce that (see
+`lib/agents/llm.ts` for the provider-routing logic).
 
 ## Reproducing the study
 
@@ -90,10 +97,10 @@ data directly.
 
 ## Demo
 
-**[▶ Watch a screen recording of a live episode](report/screenshots/PolicyTown2.mp4)**
-— click through to GitHub's video player.
+**[Watch a screen recording of a live episode](report/screenshots/PolicyTown2.mp4)**,
+click through to GitHub's video player.
 
-What the simulation looks like mid-episode — cases moving through
+What the simulation looks like mid-episode: cases moving through
 assessment, allocation, and audit toward a fixed-capacity ward. The dashed
 red line flags a twin pair that was just treated unequally:
 
@@ -108,5 +115,5 @@ The stats panel, showing a resolved pair and its policy-check verdicts:
 The canvas reuses the rendering approach from an unrelated `tangible-creativity`
 Next.js app: a plain off-white stage, soft white rounded "rooms" as zone
 containers, small circular icon tokens for agents and cases. Nothing else
-from that project carried over — this is a different instrument that only
+from that project carried over; this is a different instrument that only
 borrows the look.
