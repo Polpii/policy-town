@@ -98,13 +98,6 @@
   }
   table.method-table tr:last-child td { border-bottom: none; }
 
-  .scale-line {
-    font-size: 9.5pt;
-    color: var(--ink-soft);
-    font-style: italic;
-    margin: 4px 0 0 0;
-  }
-
   /* Screenshot */
   figure.screenshot {
     margin: 14px 0 20px 0;
@@ -197,6 +190,8 @@
 
   <p class="lead">White Circle's KillBench showed that a single LLM making forced triage calls shows measurable demographic bias. This asks what happens to that bias when the same decision is split across a team of agents with a built-in audit step, instead of made and checked by one model alone.</p>
 
+  <p>Here's the setup in plain terms: patients keep arriving needing a hospital bed, and there are only so many beds. An AI looks at each one and decides who's hurt badly enough to get a bed right now. We send it pairs of patients who are hurt exactly the same amount and differ only in something that shouldn't matter, like where they're from, then watch whether the AI treats them the same anyway.</p>
+
   <figure class="screenshot">
     <img src="screenshots/map.png" alt="PolicyTown live simulation, map view">
     <figcaption><strong>What it looks like while running.</strong> Cases move left to right through assessment, allocation, and audit toward a fixed-capacity ward. The dashed red line marks a twin pair just treated unequally: exactly what this study measures.</figcaption>
@@ -213,7 +208,7 @@
     <tr><td></td><td>P4: No private data leaks between agents. A downstream agent can't be handed demographic detail it doesn't need (not about leaks to end users, which is a different check).</td><td></td></tr>
     <tr><td></td><td>P5: Full traceability. The decision must be fully reconstructable from the record.</td><td></td></tr>
   </table>
-  <p class="scale-line">192 episodes, 2,304 resolved case pairs, GPT-4o-mini, 0 failed runs.</p>
+  <p>To actually run this at scale, we didn't click through the app by hand: a script calls the same API the app itself uses, once per agent per case, and logs every decision straight to a database, then repeats that across every combination of caseload curve, bed count, and audit capacity we wanted to test. That produced 192 full episodes and 2,304 resolved case pairs, 0 failed runs, all on GPT-4o-mini rather than a larger model, mainly to keep the API cost of running that many episodes manageable.</p>
 
   <h2><span class="num">2.</span>Results</h2>
 
@@ -228,23 +223,24 @@
   </table>
   <p class="table-note">Splitting the decision across roles doesn't change how often identical twins get different outcomes. Whatever case exists for a multi-agent pipeline, it isn't that it's fairer on the numbers alone.</p>
 
-  <p>A busy auditor catches less bias overall almost entirely because it reviews fewer cases, not because its judgment gets worse:</p>
+  <p>Here's the question that actually matters: when an auditor is overloaded, does it get worse at catching bias, or does it simply look at fewer cases in the first place? Those are two different failure modes, so the chart below tracks them separately: coverage is whether a case gets looked at at all, judgment is whether the bias gets caught once it is looked at.</p>
   <figure class="chart">
     <img src="chart_catch_rate.png" alt="Coverage drops under audit load; judgment quality does not">
   </figure>
   <p class="table-note">Coverage, whether a case gets reviewed at all, collapses from 100.0% to 65.6% under a 1-review-per-turn cap (p &lt; 0.001). Judgment quality on the cases that <em>are</em> reviewed barely moves: 81.6% vs 85.7% (p = 1.000, not significant, direction even reverses). The auditor doesn't get worse under pressure, it just sees less.</p>
 
-  <p>Reordering the audit queue by risk instead of first-come-first-served recovers most of that lost coverage:</p>
+  <p>If the real bottleneck is which cases get looked at, the fix should target that directly. So we tried one concrete change: instead of auditing decisions in the order they arrive, audit the riskiest ones first, meaning any decision whose rationale names the patient's nationality, religion, or other protected trait, or that ended in a denial. Reordering the queue this way recovers most of the lost coverage:</p>
   <table class="data">
     <tr><th>Metric</th><th>FIFO queue</th><th>Risk-priority queue</th><th>p</th></tr>
     <tr><td>Coverage</td><td>65.6%</td><td>91.7%</td><td>0.028</td></tr>
     <tr><td>Catch rate</td><td>56.2%</td><td>79.2%</td><td>0.092</td></tr>
     <tr><td>Silent-bias rate</td><td>43.8%</td><td>20.8%</td><td>0.092</td></tr>
   </table>
-  <p class="table-note">Same audit capacity, same cases (paired by seed). Just reordering the queue so decisions naming a protected attribute or ending in denial get reviewed first. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size, and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
+  <p class="table-note">Same audit capacity, same cases, paired by seed. Coverage recovers significantly. The silent-bias and catch-rate gains point the same direction but aren't confirmed at this sample size, and silent-bias here is the mathematical mirror of catch rate, not an independent check.</p>
 
   <h2><span class="num">3.</span>Discussion</h2>
   <p>The clearest result here isn't about fairness: it's about what independent review buys you that self-review structurally can't. Across all five policies, not just the bias one, a single agent auditing its own work essentially never contradicts itself, while a separate auditor catches real problems at rates from 7% to 62%, depending on the policy. That advantage erodes under load, but the erosion is a scheduling problem, not a judgment one: coverage collapses while the quality of review on cases actually seen barely moves. That's probably not specific to this setup. Any team that adds independent oversight to an agent pipeline will hit some version of the same trade-off, where the auditor is only as good as its queue, and a silent coverage gap under load can look, from the outside, like the system is working when it isn't.</p>
+  <p>This study also cut corners for practical reasons. Running one model across 192 episodes plus the follow-up experiment already added up in API cost, so we didn't compare multiple models against each other, and we didn't push the episode count past what's reported here. Both would be the obvious next step before trusting these numbers beyond GPT-4o-mini specifically.</p>
 
   <h2><span class="num">4.</span>Limitations</h2>
   <p>This is one model, GPT-4o-mini. KillBench itself found bias varies by model, so nothing here generalizes past it. Sample sizes are modest: the coverage result and the seed/episode integrity checks behind it are solid, but the raw bias-rate comparison and the priority-queue catch-rate gain are both underpowered to confirm or rule out at this n. This is a single research pass, not peer-reviewed, with no adversarial replication.</p>

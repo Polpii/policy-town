@@ -520,7 +520,6 @@ for ax, res, panel_title in [
     (axes[1], qual, "Judgment (if reviewed)"),
 ]:
     vals = [res["group1"]["rate"], res["group2"]["rate"]]
-    ns = [res["group1"]["n"], res["group2"]["n"]]
     los, his = zip(*[proportion_confint(res[k]["x"], res[k]["n"], method="wilson") for k in ("group1", "group2")])
     err = [[v - lo for v, lo in zip(vals, los)], [hi - v for v, hi in zip(vals, his)]]
     ax.bar(labels, vals, yerr=err, capsize=3, error_kw={"ecolor": INK, "elinewidth": 1}, color=colors, width=0.55)
@@ -528,9 +527,8 @@ for ax, res, panel_title in [
     ax.set_title(panel_title, fontsize=12)
     p = res["fisher_p"]
     sig_bracket(ax, 0, 1, 1.02, p, h=0.05, label_only_if_significant=False)
-    ax.text(0.5, -0.22, f"n={ns[0]} vs n={ns[1]} biased pairs", transform=ax.transAxes, ha="center",
-            fontsize=9, color=INK)
     style_ax(ax)
+    ax.grid(False)
 axes[0].set_ylabel("Share of biased pairs")
 fig.text(0.5, 1.1, "Less coverage, not less judgment", ha="center",
          fontsize=13, fontweight="bold", color=INK)
@@ -571,7 +569,7 @@ ax.set_xticklabels(short_cells)
 ax.set_ylabel("Share of twin pairs treated differently")
 p = results["bias_rate_pooled"]["fisher_p"]
 titled(ax, "Does splitting the decision across 9 agents change how often twins are treated differently?",
-       f"One agent doing everything vs. 9 agents in separate roles — not significant (p = {p:.2f})")
+       f"One agent doing everything vs. 9 agents in separate roles: not significant (p = {p:.2f})")
 ax.legend(frameon=False, loc="upper right", fontsize=10.5)
 style_ax(ax)
 fig.tight_layout()
@@ -592,7 +590,7 @@ axes[1].set_ylabel("Mean turns from decision to audit")
 axes[1].set_title("How long a case waits to be checked")
 for a in axes:
     style_ax(a)
-fig.suptitle("Both charts: Multi-agent only — a fully-staffed auditor vs. an overloaded one", fontsize=11,
+fig.suptitle("Both charts: Multi-agent only, a fully-staffed auditor vs. an overloaded one", fontsize=11,
              color=INK, style="italic", y=1.06)
 fig.tight_layout()
 fig.savefig(OUT / "chart_capacity_pressure.png", dpi=160, bbox_inches="tight")

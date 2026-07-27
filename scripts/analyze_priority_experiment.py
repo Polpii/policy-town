@@ -217,7 +217,7 @@ for ax, key, title in [(axes[0], "coverage", "Coverage: reviewed at all?"), (axe
 axes[0].set_ylabel("Share of biased pairs")
 fig.text(0.5, 1.1, "Does reviewing highest-risk decisions first recover what capacity pressure costs?",
          ha="center", fontsize=13, fontweight="bold", color=INK)
-fig.text(0.5, 1.0, "Both arms: Multi-agent, audit capacity capped at 1/turn — same 48 seeds in both",
+fig.text(0.5, 1.0, "Both arms: Multi-agent, audit capacity capped at 1/turn, same 48 seeds in both",
          ha="center", fontsize=10.5, color=INK, style="italic")
 fig.tight_layout()
 fig.savefig(OUT / "chart_priority.png", dpi=160, bbox_inches="tight")
